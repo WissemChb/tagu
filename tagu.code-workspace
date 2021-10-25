@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"go.lintOnSave": "file",
+		"go.lintTool": "golangci-lint",
+		"editor.trimAutoWhitespace": true,
+		"editor.formatOnSave": true,
+		"editor.tabSize": 4,
+		"editor.insertSpaces": true,
+		"editor.detectIndentation": true
+	},
+	"extensions": {
+		"recommendations": [
+			"golang.go"
+		]
+	}
+}
