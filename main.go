@@ -1,34 +1,22 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"tagu/aws"
-
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 )
 
 func main() {
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-west-2"))
-	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
+	tags := aws.Tags{
+		Account: "123456789012",
+		Region:  "us-east-1",
+		// RoleName: "role-name",
 	}
-
-	// Using the Config value, create the ResourceGroupsTagging client
-	client := resourcegroupstaggingapi.NewFromConfig(cfg)
-
-	params := &resourcegroupstaggingapi.GetResourcesInput{}
-
-	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(client, params, func(o *resourcegroupstaggingapi.GetResourcesPaginatorOptions) {
-		o.Limit = 50
-	})
-	res, err := aws.GetResourcesTags(context.TODO(), paginator)
+	err := tags.Run()
 	if err != nil {
-		log.Fatalf("unable to get resources tags, %v", err)
+		log.Fatalf("An error occured %v", err)
 	}
-	json, err := json.Marshal(res)
+	json, err := json.Marshal(tags.Output)
 	if err != nil {
 		log.Fatalf("failed to return json data, %v", err)
 	}
