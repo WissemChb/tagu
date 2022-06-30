@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	rt "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
@@ -48,6 +49,34 @@ func (m *mockGetResourceTagPager) NextPage(ctx context.Context, optFns ...func(*
 	output = m.Pages[m.PageNumber]
 	m.PageNumber++
 	return output, nil
+}
+
+type mockTags struct {
+	mock.Mock
+
+	Account  string
+	Region   string
+	RoleName string
+	Output   []RessourceTagResult
+	length   int
+}
+
+func (t *mockTags) getResourcesTags(ctx context.Context, cfg aws.Config, paginator GetResourcesTagsPager, creds aws.CredentialsProvider, region string) error {
+	args := t.Called(ctx, cfg, paginator, creds, region)
+	return args.Error(0)
+}
+
+func (t *mockTags) setupCredentials(ctx context.Context, cfg aws.Config, stsAPI STSAssumeRoleAPI) (creds aws.CredentialsProvider, err error) {
+	args := t.Called(ctx, cfg, stsAPI)
+	if args.Get(0) != nil {
+		return args.Get(0).(aws.CredentialsProvider), args.Error(1)
+	}
+	return nil, args.Error(1)
+}
+
+func (t *mockTags) setupRegion(cfg aws.Config) string {
+	args := t.Called(cfg)
+	return args.String(0)
 }
 
 var ResourceTagsPagesOutput = []*resourcegroupstaggingapi.GetResourcesOutput{
@@ -279,4 +308,63 @@ func TestSetupRegionSuite(t *testing.T) {
 			assert.EqualValues(fixture.expected, result)
 		})
 	}
+}
+
+func TestRunFuncSuite(t *testing.T) {
+	// cfg := aws.Config{
+	// 	Region: "us-east-2",
+	// }
+	loadDefaultConfig = func(ctx context.Context, optFns ...func(*config.LoadOptions) error) (cfg aws.Config, err error) {
+		return aws.Config{
+			Region: "us-east-2",
+		}, nil
+	}
+	newConfigForResourcegroupstaggingapi = func(cfg aws.Config, optFns ...func(*resourcegroupstaggingapi.Options)) *resourcegroupstaggingapi.Client {
+		return &resourcegroupstaggingapi.Client{}
+	}
+	resourcegroupgetpaginator = func(client resourcegroupstaggingapi.GetResourcesAPIClient, params *resourcegroupstaggingapi.GetResourcesInput, optFns ...func(*resourcegroupstaggingapi.GetResourcesPaginatorOptions)) *resourcegroupstaggingapi.GetResourcesPaginator {
+		return &resourcegroupstaggingapi.GetResourcesPaginator{}
+	}
+	stsnewconfig = func(cfg aws.Config, optFns ...func(*sts.Options)) *sts.Client {
+		return &sts.Client{}
+	}
+
+	var fixtures = []struct {
+		name     string
+		input    []RessourceTagResult
+		expected []RessourceTagResult
+		err      error
+	}{
+		{
+			"Execute Run function OK",
+			[]RessourceTagResult{},
+			[]RessourceTagResult(nil),
+			nil,
+		},
+		{
+			"Execute Run function KO",
+			[]RessourceTagResult{},
+			[]RessourceTagResult(nil),
+			errors.New("An error occurred"),
+		},
+	}
+
+	assert := assert.New(t)
+	for _, fixture := range fixtures {
+		t.Run(fixture.name, func(t *testing.T) {
+			tags := mockTags{
+				Account:  "123456789012",
+				Region:   "us-east-1",
+				RoleName: "role-name",
+			}
+			tags.On("setupCredentials", mock.Anything, mock.Anything, mock.Anything).Return(credentials.StaticCredentialsProvider{}, nil)
+			tags.On("setupRegion", mock.Anything).Return("us-east-1")
+			tags.On("getResourcesTags", mock.Anything, mock.Anything, mock.Anything, mock.Anything, "us-east-1").Return(fixture.err)
+			err := Run(&tags)
+			assert.Equal(tags.Output, fixture.expected)
+			assert.Equal(err, fixture.err)
+			assert.Equal(tags.length, 0)
+		})
+	}
+
 }

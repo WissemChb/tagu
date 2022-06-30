@@ -12,7 +12,7 @@ func main() {
 		Region:  "us-east-1",
 		// RoleName: "role-name",
 	}
-	err := tags.Run()
+	err := aws.Run(&tags)
 	if err != nil {
 		log.Fatalf("An error occured %v", err)
 	}

@@ -11,6 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
+var loadDefaultConfig = config.LoadDefaultConfig
+var newConfigForResourcegroupstaggingapi = resourcegroupstaggingapi.NewFromConfig
+var resourcegroupgetpaginator = resourcegroupstaggingapi.NewGetResourcesPaginator
+var stsnewconfig = sts.NewFromConfig
+
 // RessourceTagResult is the output of a GetResourcesTags call
 // It contains the account, region, service, resource, key and value of the tag
 // flattened in a single struct
@@ -47,6 +52,14 @@ type GetResourcesTagsPager interface {
 // We use this interface to test the function using a mocked service.
 type STSAssumeRoleAPI interface {
 	AssumeRole(ctx context.Context, params *sts.AssumeRoleInput, optFns ...func(*sts.Options)) (*sts.AssumeRoleOutput, error)
+}
+
+// GetAwsTagsApi defines the interface for the getResources, setupCredentials and setupRegion.
+// This interface used to make unittest easy to mock
+type GetAwsTagsApi interface {
+	setupCredentials(ctx context.Context, cfg aws.Config, stsAPI STSAssumeRoleAPI) (creds aws.CredentialsProvider, err error)
+	setupRegion(cfg aws.Config) string
+	getResourcesTags(ctx context.Context, cfg aws.Config, paginator GetResourcesTagsPager, creds aws.CredentialsProvider, region string) error
 }
 
 // setupCredentials setup aws.Credentials from  STS if is enabled otherwise get the default credentials
@@ -126,24 +139,24 @@ func (t *Tags) getResourcesTags(ctx context.Context, cfg aws.Config, paginator G
 
 // Run executes the tagging logic
 // It represent the entrypoint for AWS tags modules
-func (t *Tags) Run() error {
+func Run(t GetAwsTagsApi) error {
 	var creds aws.CredentialsProvider
 
 	ctx := context.TODO()
-	cfg, err := config.LoadDefaultConfig(ctx)
+	cfg, err := loadDefaultConfig(ctx)
 	if err != nil {
 		return err
 	}
 
 	// Using the Config value, create the ResourceGroupsTagging client
-	rsclient := resourcegroupstaggingapi.NewFromConfig(cfg)
+	rsclient := newConfigForResourcegroupstaggingapi(cfg)
 
 	params := &resourcegroupstaggingapi.GetResourcesInput{}
 
-	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(rsclient, params, func(o *resourcegroupstaggingapi.GetResourcesPaginatorOptions) {
+	paginator := resourcegroupgetpaginator(rsclient, params, func(o *resourcegroupstaggingapi.GetResourcesPaginatorOptions) {
 		o.Limit = 50
 	})
-	stsclient := sts.NewFromConfig(cfg)
+	stsclient := stsnewconfig(cfg)
 	creds, err = t.setupCredentials(ctx, cfg, stsclient)
 	if err != nil {
 		return err
