@@ -3,9 +3,10 @@ module tagu
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.43.26
-	github.com/aws/aws-sdk-go-v2/config v1.13.1 // direct
+	github.com/aws/aws-sdk-go-v2 v1.16.5
+	github.com/aws/aws-sdk-go-v2/config v1.15.11
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.6
 	github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi v1.11.0 // direct
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.7
 	github.com/stretchr/testify v1.7.1
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
