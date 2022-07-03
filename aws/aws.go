@@ -11,10 +11,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 )
 
-var loadDefaultConfig = config.LoadDefaultConfig
-var newConfigForResourcegroupstaggingapi = resourcegroupstaggingapi.NewFromConfig
-var resourcegroupgetpaginator = resourcegroupstaggingapi.NewGetResourcesPaginator
-var stsnewconfig = sts.NewFromConfig
+var (
+	loadDefaultConfig                    = config.LoadDefaultConfig
+	newConfigForResourcegroupstaggingapi = resourcegroupstaggingapi.NewFromConfig
+	resourcegroupgetpaginator            = resourcegroupstaggingapi.NewGetResourcesPaginator
+	stsnewconfig                         = sts.NewFromConfig
+)
 
 // RessourceTagResult is the output of a GetResourcesTags call
 // It contains the account, region, service, resource, key and value of the tag
@@ -111,7 +113,6 @@ func (t *Tags) getResourcesTags(ctx context.Context, cfg aws.Config, paginator G
 			opts.Credentials = creds
 			opts.Region = region
 		})
-
 		if err != nil {
 			return err
 		}

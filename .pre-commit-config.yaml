@@ -21,3 +21,11 @@ repos:
       - id: golangci-lint
       - id: go-unit-tests
       - id: go-mod-tidy
+
+  - repo: https://github.com/Bahjat/pre-commit-golang
+    rev: v1.0.1
+    hooks:
+      - id: go-fmt-import
+      - id: gofumpt # requires github.com/mvdan/gofumpt
+      - id: go-err-check # requires github.com/kisielk/errcheck
+      - id: go-static-check # install https://staticcheck.io/docs/
