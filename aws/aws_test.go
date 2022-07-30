@@ -34,7 +34,6 @@ func (s *mockSTSAssumeRoleAPI) AssumeRole(ctx context.Context, params *sts.Assum
 		return args.Get(0).(*sts.AssumeRoleOutput), args.Error(1)
 	}
 	return nil, args.Error(1)
-
 }
 
 func (m *mockGetResourceTagPager) HasMorePages() bool {
@@ -151,7 +150,7 @@ func TestGetResourceTagPagerSuite(t *testing.T) {
 		},
 	}
 
-	var fixtures = []struct {
+	fixtures := []struct {
 		name     string
 		err      error
 		expected []RessourceTagResult
@@ -204,7 +203,7 @@ func TestSetupCredentialsSuite(t *testing.T) {
 		RoleName: "role-name",
 	}
 
-	var fixtures = []struct {
+	fixtures := []struct {
 		name         string
 		defaultCreds aws.CredentialsProvider
 		input        *sts.AssumeRoleOutput
@@ -272,7 +271,6 @@ func TestSetupCredentialsSuite(t *testing.T) {
 			assert.Equal(err, fixture.err)
 		})
 	}
-
 }
 
 func TestSetupRegionSuite(t *testing.T) {
@@ -283,7 +281,7 @@ func TestSetupRegionSuite(t *testing.T) {
 		Account: "123456789012",
 		Region:  "",
 	}
-	var fixtures = []struct {
+	fixtures := []struct {
 		name     string
 		input    string
 		expected string
@@ -329,7 +327,7 @@ func TestRunFuncSuite(t *testing.T) {
 		return &sts.Client{}
 	}
 
-	var fixtures = []struct {
+	fixtures := []struct {
 		name     string
 		input    []RessourceTagResult
 		expected []RessourceTagResult
@@ -366,5 +364,4 @@ func TestRunFuncSuite(t *testing.T) {
 			assert.Equal(tags.length, 0)
 		})
 	}
-
 }

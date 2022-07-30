@@ -1,0 +1,32 @@
+role-name: test-role
+filter-input:
+  - account: 236534879095
+    regions:
+      - us-west-1
+      - eu-west-1
+    resources:
+      - ec2:instance
+    filter-tags:
+      - key: env
+        values:
+          - prod
+  - account: 636568979095
+    regions:
+      - us-east-1
+      - eu-east-2
+    resources:
+      - rds
+      - s3
+      - lambda
+    filter-tags:
+      - key: Schedule
+  - account: 436567879095
+    regions:
+      - us-east-3
+      - eu-west-6
+    resources:
+      - ec2
+      - rds
+    filter-tags:
+      - values:
+        - dev

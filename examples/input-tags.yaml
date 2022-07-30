@@ -1,0 +1,18 @@
+role-name: test-role
+accounts:
+  - 236534879095
+  - 636568979095
+  - 436567879095
+regions:
+  - us-west-1
+  - eu-west-1
+  - eu-west-6
+resources:
+  - ec2:instance
+  - rds
+  - s3
+  - lambda
+filter-tags:
+  - key: env
+    values:
+      - PROD

@@ -21,3 +21,20 @@ repos:
       - id: golangci-lint
       - id: go-unit-tests
       - id: go-mod-tidy
+
+  - repo: https://github.com/Bahjat/pre-commit-golang
+    rev: v1.0.1
+    hooks:
+      - id: go-fmt-import
+      - id: gofumpt # requires github.com/mvdan/gofumpt
+      - id: go-static-check # install https://staticcheck.io/docs/
+
+  # errcheck does not accept argument in the repository above
+  - repo: local
+    hooks:
+      - id: errcheck
+        name: go errcheck
+        entry: errcheck -ignoretests ./...
+        language: system
+        types: [shell]
+        always_run: true
