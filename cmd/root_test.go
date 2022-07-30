@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -50,6 +51,9 @@ func execute(t *testing.T, c *cobra.Command, args ...string) (string, error) {
 func TestRootCmdSuite(t *testing.T) {
 	assert := assert.New(t)
 
+	// Get the current project
+	absConfig, _ := filepath.Abs("../")
+
 	root := &cobra.Command{Use: "tagu", RunE: rootCmdRunE}
 	initRootFlags(root)
 
@@ -70,17 +74,17 @@ func TestRootCmdSuite(t *testing.T) {
 		{
 			name:     "Test root config from CONFIG",
 			args:     []string{},
-			env:      "/workspaces/tagu/examples/input-tags.yaml",
-			expected: "Load configuration file /workspaces/tagu/examples/input-tags.yaml",
+			env:      absConfig + "/examples/input-tags.yaml",
+			expected: "Load configuration file " + absConfig + "/examples/input-tags.yaml",
 			err:      nil,
 		},
 		{
 			name: "Test root config flag",
 			args: []string{
 				"-c",
-				"/workspaces/tagu/examples/aws-tags.yaml",
+				absConfig + "/examples/aws-tags.yaml",
 			},
-			expected: "Load configuration file /workspaces/tagu/examples/aws-tags.yaml",
+			expected: "Load configuration file " + absConfig + "/examples/aws-tags.yaml",
 			err:      nil,
 		},
 	}

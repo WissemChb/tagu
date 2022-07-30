@@ -25,6 +25,7 @@ package cmd
 import (
 	"errors"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"tagu/models"
@@ -34,21 +35,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// func execute(t *testing.T, c *cobra.Command, args ...string) (string, error) {
-// 	t.Helper()
-
-// 	buf := new(bytes.Buffer)
-// 	c.SetOut(buf)
-// 	c.SetErr(buf)
-// 	c.SetArgs(args)
-
-// 	err := c.Execute()
-// 	s := strings.TrimSpace(buf.String())
-// 	return s, err
-// }
-
 func TestAwsCmdSuite(t *testing.T) {
 	assert := assert.New(t)
+
+	// Get the current project
+	absConfig, _ := filepath.Abs("../")
 
 	aws := &cobra.Command{Use: "aws", RunE: awsCmdRunE}
 	initAwsFlags(aws)
@@ -69,17 +60,17 @@ func TestAwsCmdSuite(t *testing.T) {
 		{
 			name:     "Test AWS config from AWS_CONFIG",
 			args:     []string{},
-			env:      "/workspaces/tagu/examples/input-tags.yaml",
-			expected: "Load configuration file /workspaces/tagu/examples/input-tags.yaml",
+			env:      absConfig + "/examples/input-tags.yaml",
+			expected: "Load configuration file " + absConfig + "/examples/input-tags.yaml",
 			err:      nil,
 		},
 		{
 			name: "Test AWS config flag",
 			args: []string{
 				"-i",
-				"/workspaces/tagu/examples/aws-tags.yaml",
+				absConfig + "/examples/aws-tags.yaml",
 			},
-			expected: "Load configuration file /workspaces/tagu/examples/aws-tags.yaml",
+			expected: "Load configuration file " + absConfig + "/examples/aws-tags.yaml",
 			err:      nil,
 		},
 	}
@@ -101,6 +92,9 @@ func TestAwsCmdSuite(t *testing.T) {
 func TestLoadAwsConfigSuite(t *testing.T) {
 	assert := assert.New(t)
 
+	// Get the current project
+	absConfig, _ := filepath.Abs("../")
+
 	fixtures := []struct {
 		name     string
 		input    string
@@ -109,7 +103,7 @@ func TestLoadAwsConfigSuite(t *testing.T) {
 	}{
 		{
 			name:  "Test Load config OK",
-			input: "/workspaces/tagu/examples/aws-tags.yaml",
+			input: absConfig + "/examples/aws-tags.yaml",
 			expected: &models.Spec{
 				RoleName: "test-role",
 				FilterInput: []models.InputTag{
@@ -178,7 +172,7 @@ func TestLoadAwsConfigSuite(t *testing.T) {
 		},
 		{
 			name:  "Build AWS config file OK",
-			input: "/workspaces/tagu/examples/aws-general.yaml",
+			input: absConfig + "/examples/aws-general.yaml",
 			expected: &models.Spec{
 				RoleName: "test-role",
 				FilterInput: []models.InputTag{
