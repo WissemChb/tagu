@@ -27,5 +27,14 @@ repos:
     hooks:
       - id: go-fmt-import
       - id: gofumpt # requires github.com/mvdan/gofumpt
-      - id: go-err-check # requires github.com/kisielk/errcheck
       - id: go-static-check # install https://staticcheck.io/docs/
+
+  # errcheck does not accept argument in the repository above
+  - repo: local
+    hooks:
+      - id: errcheck
+        name: go errcheck
+        entry: errcheck -ignoretests ./...
+        language: system
+        types: [shell]
+        always_run: true
