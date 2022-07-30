@@ -63,13 +63,13 @@ func TestAwsCmdSuite(t *testing.T) {
 		{
 			name:     "Test AWS config no option specified",
 			args:     []string{},
-			expected: "Error: Config File \"input-tags\" Not Found in \"[/root]\"\nUsage:\n  aws [flags]\n\nFlags:\n  -h, --help                help for aws\n  -i, --input-file string   the input file",
-			err:      errors.New("Config File \"input-tags\" Not Found in \"[/root]\""),
+			expected: "Error: Config File \"config\" Not Found in \"[]\"\nUsage:\n  aws [flags]\n\nFlags:\n  -h, --help                help for aws\n  -i, --input-file string   the input file",
+			err:      errors.New("Config File \"config\" Not Found in \"[]\""),
 		},
 		{
-			name:     "Test AWS config from HOME",
+			name:     "Test AWS config from AWS_CONFIG",
 			args:     []string{},
-			env:      "/workspaces/tagu/examples/",
+			env:      "/workspaces/tagu/examples/input-tags.yaml",
 			expected: "Load configuration file /workspaces/tagu/examples/input-tags.yaml",
 			err:      nil,
 		},
@@ -87,8 +87,8 @@ func TestAwsCmdSuite(t *testing.T) {
 	for _, fixture := range fixtures {
 		t.Run(fixture.name, func(t *testing.T) {
 			if fixture.env != "" {
-				os.Setenv("HOME", fixture.env)
-				defer os.Setenv("HOME", "/root")
+				os.Setenv("AWS_CONFIG", fixture.env)
+				defer os.Unsetenv("AWS_CONFIG")
 			}
 			defer viper.Reset()
 			res, err := execute(t, aws, fixture.args...)

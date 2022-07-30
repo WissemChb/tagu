@@ -23,7 +23,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"tagu/models"
 
@@ -80,15 +79,9 @@ func awsloadConfig(tags string) (spec models.Spec, err error) {
 	if tags != "" {
 		viper.SetConfigFile(tags)
 	} else {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return spec, err
-		}
-		viper.AddConfigPath(home)
-		viper.SetConfigName("input-tags")
+		viper.AutomaticEnv() // read in environment variables that match
+		viper.SetConfigFile(viper.GetString("aws_config"))
 	}
-
-	viper.AutomaticEnv() // read in environment variables that match
 
 	err = viper.ReadInConfig() // Read config file
 	if err != nil {

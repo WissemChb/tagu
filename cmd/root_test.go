@@ -64,13 +64,13 @@ func TestRootCmdSuite(t *testing.T) {
 			name:     "Test root config no option specified",
 			args:     []string{},
 			env:      "",
-			expected: "Error: Config File \"input-tags\" Not Found in \"[/root]\"\nUsage:\n  tagu [flags]\n\nFlags:\n  -c, --config string   config file (default is $HOME/.tagu.yaml)\n  -h, --help            help for tagu",
-			err:      errors.New("Config File \"input-tags\" Not Found in \"[/root]\""),
+			expected: "Error: Config File \"config\" Not Found in \"[]\"\nUsage:\n  tagu [flags]\n\nFlags:\n  -c, --config string   config file (default is $HOME/.tagu.yaml)\n  -h, --help            help for tagu",
+			err:      errors.New("Config File \"config\" Not Found in \"[]\""),
 		},
 		{
-			name:     "Test root config from HOME",
+			name:     "Test root config from CONFIG",
 			args:     []string{},
-			env:      "/workspaces/tagu/examples/",
+			env:      "/workspaces/tagu/examples/input-tags.yaml",
 			expected: "Load configuration file /workspaces/tagu/examples/input-tags.yaml",
 			err:      nil,
 		},
@@ -88,8 +88,8 @@ func TestRootCmdSuite(t *testing.T) {
 	for _, fixture := range fixtures {
 		t.Run(fixture.name, func(t *testing.T) {
 			if fixture.env != "" {
-				os.Setenv("HOME", fixture.env)
-				defer os.Setenv("HOME", "/root")
+				os.Setenv("CONFIG", fixture.env)
+				defer os.Unsetenv("CONFIG")
 			}
 			defer viper.Reset()
 			res, err := execute(t, root, fixture.args...)

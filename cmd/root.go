@@ -88,18 +88,9 @@ func rootLoadConfig(flag string) (err error) {
 		// Use config file from the flag.
 		viper.SetConfigFile(flag)
 	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
-
-		// Search config in home directory with name ".tagu" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName("input-tags")
+		viper.AutomaticEnv() // read in environment variables that match
+		viper.SetConfigFile(viper.GetString("config"))
 	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
 	err = viper.ReadInConfig() // Read config file
 	if err != nil {
 		return fmt.Errorf("%s", err)
